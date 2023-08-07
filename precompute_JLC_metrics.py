@@ -9,7 +9,7 @@ import torch
 from torch_geometric.utils import to_undirected, remove_self_loops
 
 from models.JLC_curvature import compute_JLC_matrices
-from load_data.data import get_dataset, PPRDataset
+from load_data.data import get_dataset
 
 DATA_PATH = 'data'
 

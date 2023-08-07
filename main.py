@@ -14,7 +14,7 @@ import torch.nn.functional as functional
 from torch_geometric.utils import to_undirected, remove_self_loops
 
 from models.GNN_models import GCN, SGC
-from models.JLC_curvature import jost_liu_curvature_adding, compute_JLC_matrices
+from models.JLC_curvature import compute_JLC_matrices
 from models.BFC_curvature import stochastic_discrete_ricci_flow_rewiring
 from load_data.data import get_dataset, PPRDataset, set_train_val_test_split
 from load_data.seeds import val_seeds, test_seeds
@@ -54,8 +54,6 @@ parser.add_argument('--lambda_p', type=float, default=0.01,
                     help='The balancing factor lambda of DGN.')
 parser.add_argument("--DropEdge", action='store_true', default=False,
                     help='Activate DropEdge Layers.')
-parser.add_argument("--JostLiuCurvature", action='store_true', default=False,
-                    help='Activate JostLiuCurvature.')
 parser.add_argument("--JostLiuCurvature_Online", action='store_true', default=False,
                     help='Activate JostLiuCurvature_Online.')
 parser.add_argument("--pA", type=float, default=0.1,
@@ -152,20 +150,6 @@ else:
 dataset.data = dataset.data.to(device)
 n_edges = dataset.data.edge_index.shape[1]  # Number of edges
 n = dataset.data.num_nodes  # Number of nodes
-
-if args.JostLiuCurvature:
-    args.mask_JLC, edge_index_JLC, edge_index_original = jost_liu_curvature_adding(dataset.data.edge_index, args.pA,
-                                                                                   args.tau, n, n_edges, device,
-                                                                                   dataset_name,
-                                                                                   force_undirected=args.undirected)
-    dataset.data.edge_index = edge_index_original
-    if args.undirected:
-        dataset.data.edge_index_JLC = edge_index_JLC
-    if args.undirected:
-        n_edges2drop = int(n_edges/2 * args.pD)
-    else:
-        n_edges2drop = int(n_edges * args.pD)
-    args.number_edges2drop = n_edges2drop
 
 
 if args.JostLiuCurvature_Online:
@@ -274,15 +258,6 @@ for n_layers in args.n_layers_set:
             best_acc_test_vec[cont_repetition, epoch] = test_acc
             best_acc_val_vec[cont_repetition, epoch] = best_val_acc
             end_time = time.time()
-            '''
-            if args.hyperparameterTunning_mode == False:
-                log = 'n_layers={:02d}, Epoch={:03d}, Loss train={:.4f}, Loss val={:.4f}, Loss test={:.4f}, ' \
-                      'Train acc={:.4f}, Best val acc={:.4f}, Best test acc={:.4f}, Error test={:.4f}, ' \
-                      'learning rate={:.6f}, Time={:.4f} seg'
-                print(log.format(n_layers, epoch, loss_train, loss_val, loss_test, train_acc, best_val_acc, test_acc,
-                                 err_test_vec[cont_repetition, epoch], optimizer.param_groups[0]['lr'],
-                                 end_time-start_time))
-            '''
             sys.stdout.flush()
         file_name_base = dataset_name + '_nL_' + str(n_layers) + '_hU_' + str(args.hidden_units) + '_lr_' + \
                          str(args.lr) + '_wD_' + str(args.weight_decay) + '_dr_' + str(args.dropout) + '_mE_' + \

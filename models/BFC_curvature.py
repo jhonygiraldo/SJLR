@@ -138,7 +138,6 @@ def stochastic_discrete_ricci_flow_rewiring(edge_index, iterRicci, tau, c, n, n_
             dataset_name (str): Dataset name.
             force_undirected: If set to :obj:`True`, we will force the output graph to be undirected.
         """
-    # Number of added edges after which we update the Jost & Liu curvature for Pubmed and squirrel datasets.
     update_curvature_module = 1000
     edge_index_original = edge_index.clone()
     if force_undirected:
@@ -183,7 +182,6 @@ def stochastic_discrete_ricci_flow_rewiring(edge_index, iterRicci, tau, c, n, n_
         indx_non_existing_edges = torch.where(Adj_index[car_prod_Sx_Sy[:, 0], car_prod_Sx_Sy[:, 1]] == 0)[0]
         car_prod_Sx_Sy = car_prod_Sx_Sy[indx_non_existing_edges]
         JLC_improvement = torch.zeros((car_prod_Sx_Sy.shape[0],))
-        # Compute the improvement in the Jost & Liu curvature by adding the edges in car_prod_Sx_Sy.
         Adj_row_col = Adj.coalesce().indices()
         for j in range(0, car_prod_Sx_Sy.shape[0]):
             node_u = car_prod_Sx_Sy[j, 0]
@@ -194,7 +192,6 @@ def stochastic_discrete_ricci_flow_rewiring(edge_index, iterRicci, tau, c, n, n_
                 S_y_temp = torch.cat((S_y_original, node_v.reshape((1,))))
             if node_v == node_x:
                 S_x_temp = torch.cat((S_x_original, node_u.reshape((1,))))
-            # start_time = time.time()
             Adj_row_col_temp = Adj_row_col.clone()
             Adj_row_col_temp = torch.cat((Adj_row_col_temp, car_prod_Sx_Sy[j].reshape((2, 1))), dim=1)
             if force_undirected:
@@ -224,7 +221,6 @@ def stochastic_discrete_ricci_flow_rewiring(edge_index, iterRicci, tau, c, n, n_
                 Adj_index[sampled_edge[0][1], sampled_edge[0][0]] = torch.max(torch.max(Adj_index))
             edge_index = torch.cat((edge_index, torch.IntTensor([[sampled_edge[0][0], sampled_edge[0][1]]]).T), dim=1)
             Adj = torch.sparse.LongTensor(Adj_row_col, torch.ones((Adj_row_col.shape[1],)))
-            # We update the Jost & Liu curvature of the edges when required.
             new_JLC = compute_jost_liu_curvature(Adj, sampled_edge[0][0], sampled_edge[0][1], is_adj_sparse=True)
             JLC = torch.cat((JLC, new_JLC))
             #
@@ -241,7 +237,7 @@ def stochastic_discrete_ricci_flow_rewiring(edge_index, iterRicci, tau, c, n, n_
                 B_v = Adj[sampled_edge[0][1]].coalesce().indices()[0]
                 B_v = torch.cat((B_v, sampled_edge[0][1].reshape((1,)).cpu()))
                 car_prod_B_u_B_v = torch.cartesian_prod(B_u, B_v)
-                # Remove non existing edges to update the curvature, i.e., keep only existing edges.
+                # Remove non-existing edges to update the curvature, i.e., keep only existing edges.
                 indx_existing_edges = torch.where(Adj_index[car_prod_B_u_B_v[:, 0], car_prod_B_u_B_v[:, 1]] > 0)[0]
                 car_prod_B_u_B_v = car_prod_B_u_B_v[indx_existing_edges]
                 for j in range(0, car_prod_B_u_B_v.shape[0]):

@@ -22,7 +22,7 @@ Inside the repository, create the following folders
 mkdir hyperparameters_tuning hyperparameters_tuning/GCN hyperparameters_tuning/GCN_hyperTuning
 mkdir results results/GCN results/GCN_Deep
 ```
-Install the requirements.
+Install the requirements: pytorch, pytorch geometric (PyG), seaborn, and standard libraries of python like numpy and pickle. If you want to execute the script JLC_vs_BFC.py, please also install networkx.
 
 - - - -
 ## Citation

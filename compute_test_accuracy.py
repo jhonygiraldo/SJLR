@@ -26,8 +26,6 @@ parser.add_argument("--DiffGroupNorm", action='store_true', default=False,
                     help='Activate DiffGroupNorm Layers.')
 parser.add_argument("--DropEdge", action='store_true', default=False,
                     help='Activate DropEdge Layers.')
-parser.add_argument("--JostLiuCurvature", action='store_true', default=False,
-                    help='Activate JostLiuCurvature.')
 parser.add_argument("--JostLiuCurvature_Online", action='store_true', default=False,
                     help='Activate JostLiuCurvature.')
 parser.add_argument("--FALayer", action='store_true', default=False,
@@ -60,11 +58,6 @@ weight_decay_parameters = hyperparameters["weight_decay"]
 hidden_units_parameters = hyperparameters["hidden_units"]
 dropout_parameters = hyperparameters["dropout"]
 n_layers_parameters = hyperparameters["n_layers"]
-if args.JostLiuCurvature:
-    pA_parameters = hyperparameters["pA"]
-    pD_parameters = hyperparameters["pD"]
-    tau_parameters = hyperparameters["tau"]
-    alpha_parameters = hyperparameters["alpha"]
 if args.JostLiuCurvature_Online:
     pA_parameters = hyperparameters["pA"]
     pD_parameters = hyperparameters["pD"]
@@ -95,10 +88,6 @@ for i in range(0, search_iterations):
                      str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + \
                      '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
                      '_RC_' + str(args.RicciCurvature)
-    if args.JostLiuCurvature:
-        complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + '_tau_' + \
-                               str(tau_parameters[i]) + '_alpha_' + str(alpha_parameters[i])
-        file_name_base = file_name_base + complement_file_name
     if args.JostLiuCurvature_Online:
         complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + '_alpha_' + str(alpha_parameters[i])
         file_name_base = file_name_base + complement_file_name
@@ -132,7 +121,6 @@ for i in range(0, search_iterations):
 best_val_indx = np.where(val_mean == np.max(val_mean))
 if best_val_indx[0].shape[0] > 1:
     best_val_indx = ([best_val_indx[0][0]],)
-#best_val_indx = best_val_indx[0][0]
 results_log = 'The best result for rDC_' + str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + \
               '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
               str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + \
@@ -143,11 +131,6 @@ hyperparameters_log = 'n_layers: ' + str(int(n_layers_parameters[best_val_indx])
                       str(int(hidden_units_parameters[best_val_indx])) + ' lr: ' + str(lr_parameters[best_val_indx]) + \
                       ' weightDecay: ' + str(weight_decay_parameters[best_val_indx]) + ' dropout: ' + \
                       str(dropout_parameters[best_val_indx])
-if args.JostLiuCurvature:
-    complement_hyperparameters_log = ' pA: ' + str(pA_parameters[best_val_indx]) + ' pD: ' + \
-                                     str(pD_parameters[best_val_indx]) + '_tau_' + str(tau_parameters[best_val_indx]) +\
-                                     ' alpha: ' + str(alpha_parameters[best_val_indx])
-    hyperparameters_log = hyperparameters_log + complement_hyperparameters_log
 if args.JostLiuCurvature_Online:
     complement_hyperparameters_log = ' pA: ' + str(pA_parameters[best_val_indx]) + ' pD: ' + \
                                      str(pD_parameters[best_val_indx]) + ' alpha: ' + str(alpha_parameters[best_val_indx])
@@ -179,11 +162,6 @@ base_script_name = 'python main.py --epochs ' + str(epochs) + ' --lr ' + str(lr_
                    str(int(hidden_units_parameters[best_val_indx])) + ' --n_layers_set ' + \
                    str(int(n_layers_parameters[best_val_indx])) + ' --dropout ' + \
                    str(dropout_parameters[best_val_indx][0]) + ' --dataset ' + dataset + ' --GNN ' + args.GNN
-if args.JostLiuCurvature:
-    complement_script_name = ' --JostLiuCurvature --pA ' + str(pA_parameters[best_val_indx][0]) + ' --pD ' + \
-                             str(pD_parameters[best_val_indx][0]) + ' --tau ' + str(tau_parameters[best_val_indx][0]) +\
-                             ' --alpha ' + str(alpha_parameters[best_val_indx][0])
-    base_script_name = base_script_name + complement_script_name
 if args.JostLiuCurvature_Online:
     complement_script_name = ' --JostLiuCurvature_Online --pA ' + str(pA_parameters[best_val_indx][0]) + ' --pD ' + \
                              str(pD_parameters[best_val_indx][0]) + ' --alpha ' + str(alpha_parameters[best_val_indx][0])
@@ -227,11 +205,6 @@ file_name_base = 'results/' + args.GNN + '/' + dataset + '_nL_' + str(int(n_laye
                  + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + '_JLCo_' + \
                  str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
                  '_RC_' + str(args.RicciCurvature)
-if args.JostLiuCurvature:
-    complement_file_name = '_pA_' + str(pA_parameters[best_val_indx][0]) + '_pD_' + str(pD_parameters[best_val_indx][0])\
-                           + '_tau_' + str(tau_parameters[best_val_indx][0]) + '_alpha_' + \
-                           str(alpha_parameters[best_val_indx][0])
-    file_name_base = file_name_base + complement_file_name
 if args.JostLiuCurvature_Online:
     complement_file_name = '_pA_' + str(pA_parameters[best_val_indx][0]) + '_pD_' + str(pD_parameters[best_val_indx][0])\
                            + '_alpha_' + str(alpha_parameters[best_val_indx][0])

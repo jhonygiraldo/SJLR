@@ -25,8 +25,6 @@ parser.add_argument("--DiffGroupNorm", action='store_true', default=False,
                     help='Activate DiffGroupNorm Layers.')
 parser.add_argument("--DropEdge", action='store_true', default=False,
                     help='Activate DropEdge Layers.')
-parser.add_argument("--JostLiuCurvature", action='store_true', default=False,
-                    help='Activate JostLiuCurvature.')
 parser.add_argument("--JostLiuCurvature_Online", action='store_true', default=False,
                     help='Activate JostLiuCurvature_Online.')
 parser.add_argument("--FALayer", action='store_true', default=False,
@@ -52,14 +50,6 @@ hidden_units_space = np.array([16, 32, 64, 128])
 dropout_space = np.array([0.3, 0.6])
 n_layers_space = np.array([2, 3, 4])
 # Search space hyperparameters of Jost & Liu curvature.
-if args.JostLiuCurvature:
-    if dataset in ['Pubmed', 'squirrel']:
-        pA_space = np.array([0, 0.2])
-    else:
-        pA_space = np.array([0, 1])
-    pD_space = np.array([0, 1])
-    tau_space = np.array([1, 500])
-    alpha_space = np.array([0, 1])
 if args.JostLiuCurvature_Online:
     pA_space = np.array([0, 1])
     pD_space = np.array([0, 1])
@@ -98,11 +88,6 @@ if exists(file_name_hyperparameters):
     hidden_units_parameters = hyperparameters["hidden_units"]
     dropout_parameters = hyperparameters["dropout"]
     n_layers_parameters = hyperparameters["n_layers"]
-    if args.JostLiuCurvature:
-        pA_parameters = hyperparameters["pA"]
-        pD_parameters = hyperparameters["pD"]
-        tau_parameters = hyperparameters["tau"]
-        alpha_parameters = hyperparameters["alpha"]
     if args.JostLiuCurvature_Online:
         pA_parameters = hyperparameters["pA"]
         pD_parameters = hyperparameters["pD"]
@@ -128,11 +113,6 @@ else:
     hidden_units_parameters = np.zeros((search_iterations,))
     dropout_parameters = np.zeros((search_iterations,))
     n_layers_parameters = np.zeros((search_iterations,))
-    if args.JostLiuCurvature:
-        pA_parameters = np.zeros((search_iterations,))
-        pD_parameters = np.zeros((search_iterations,))
-        tau_parameters = np.zeros((search_iterations,))
-        alpha_parameters = np.zeros((search_iterations,))
     if args.JostLiuCurvature_Online:
         pA_parameters = np.zeros((search_iterations,))
         pD_parameters = np.zeros((search_iterations,))
@@ -164,10 +144,6 @@ for i in range(0, search_iterations):
                          str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
                          str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
                          str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
-        if args.JostLiuCurvature:
-            complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + \
-                                   '_tau_' + str(tau_parameters[i]) + '_alpha_' + str(alpha_parameters[i])
-            file_name_base = file_name_base + complement_file_name
         if args.JostLiuCurvature_Online:
             complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + \
                                    '_alpha_' + str(alpha_parameters[i])
@@ -219,19 +195,6 @@ for i in range(0, search_iterations):
         n_layers = np.random.choice(n_layers_space, size=1)
         n_layers_parameters[i] = n_layers
         # Jost & Liu curvature random sampling.
-        if args.JostLiuCurvature:
-            pA = np.random.uniform(pA_space[0], pA_space[1], size=1)
-            pA = np.round(pA, decimals=4)
-            pA_parameters[i] = pA
-            pD = np.random.uniform(pD_space[0], pD_space[1], size=1)
-            pD = np.round(pD, decimals=4)
-            pD_parameters[i] = pD
-            tau = np.random.uniform(tau_space[0], tau_space[1], size=1)
-            tau = np.round(tau, decimals=4)
-            tau_parameters[i] = tau
-            alpha = np.random.uniform(alpha_space[0], alpha_space[1], size=1)
-            alpha = np.round(alpha, decimals=4)
-            alpha_parameters[i] = alpha
         if args.JostLiuCurvature_Online:
             pA = np.random.uniform(pA_space[0], pA_space[1], size=1)
             pA = np.round(pA, decimals=4)
@@ -275,10 +238,6 @@ for i in range(0, search_iterations):
                            str(weight_decay[0]) + ' --hidden_units ' + str(hidden_units[0]) + ' --n_layers_set ' + \
                            str(n_layers[0]) + ' --dropout ' + str(dropout[0]) + ' --dataset ' + dataset + ' --GNN ' + \
                            args.GNN + ' --hyperparameterTunning_mode'
-        if args.JostLiuCurvature:
-            complement_script_name = ' --JostLiuCurvature --pA ' + str(pA[0]) + ' --pD ' + str(pD[0]) + ' --tau ' + \
-                                     str(tau[0]) + ' --alpha ' + str(alpha[0])
-            base_script_name = base_script_name + complement_script_name
         if args.JostLiuCurvature_Online:
             complement_script_name = ' --JostLiuCurvature_Online --pA ' + str(pA[0]) + ' --pD ' + str(pD[0]) + ' --alpha ' + \
                                      str(alpha[0])
@@ -323,11 +282,6 @@ for i in range(0, search_iterations):
         hyperparameters["hidden_units"] = hidden_units_parameters
         hyperparameters["dropout"] = dropout_parameters
         hyperparameters["n_layers"] = n_layers_parameters
-        if args.JostLiuCurvature:
-            hyperparameters["pA"] = pA_parameters
-            hyperparameters["pD"] = pD_parameters
-            hyperparameters["tau"] = tau_parameters
-            hyperparameters["alpha"] = alpha_parameters
         if args.JostLiuCurvature_Online:
             hyperparameters["pA"] = pA_parameters
             hyperparameters["pD"] = pD_parameters
