@@ -31,5 +31,3 @@ If you use our code, please cite
           booktitle={ACM International Conference on Information and Knowledge Management},
           year={2023}
         }
-        
-- - - -
