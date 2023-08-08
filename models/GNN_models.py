@@ -1,4 +1,4 @@
-__author__ = "Masked_for_double_blind_review"
+__author__ = "Jhony H. Giraldo"
 __license__ = "MIT"
 
 import torch
