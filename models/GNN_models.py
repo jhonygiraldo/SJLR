@@ -30,7 +30,6 @@ class GCN(torch.nn.Module):
         self.DiffGroupNorm = args.DiffGroupNorm
         self.JostLiuCurvature_Online = args.JostLiuCurvature_Online
         self.FALayer = args.FALayer
-        self.is_deep_experiment = args.is_deep_experiment
         self.is_undirected = args.undirected
         self.pD = args.pD
         self.alpha = args.alpha
@@ -122,7 +121,6 @@ class SGC(torch.nn.Module):
         self.DiffGroupNorm = args.DiffGroupNorm
         self.JostLiuCurvature_Online = args.JostLiuCurvature_Online
         self.FALayer = args.FALayer
-        self.is_deep_experiment = args.is_deep_experiment
         self.is_undirected = args.undirected
         self.pD = args.pD
         self.alpha = args.alpha

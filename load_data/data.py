@@ -8,7 +8,6 @@ import pickle
 
 import torch
 from torch_geometric.data import Data, InMemoryDataset
-#from torch_geometric.datasets import Planetoid, Amazon, Coauthor, WebKB, WikipediaNetwork, Actor, LRGBDataset
 from torch_geometric.datasets import Planetoid, Amazon, Coauthor, WebKB, WikipediaNetwork, Actor
 
 from .seeds import development_seed

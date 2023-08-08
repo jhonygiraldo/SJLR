@@ -3,7 +3,9 @@ __license__ = "MIT"
 
 import os
 import argparse
+
 from os.path import exists
+import os
 
 import numpy as np
 import pickle
@@ -76,9 +78,9 @@ search_iterations = args.search_iterations
 # Look if there is previous jobs
 file_name_hyperparameters = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/' + dataset + '_rDC_' + \
                             str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + \
-                            str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-                            str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
-                            str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + '.pkl'
+                            str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+                            str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + \
+                            str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + '.pkl'
 # Check if there are work in this dataset
 if exists(file_name_hyperparameters):
     with open(file_name_hyperparameters, 'rb') as f:
@@ -141,9 +143,9 @@ for i in range(0, search_iterations):
                          '_lr_' + str(lr_parameters[i]) + '_wD_' + str(weight_decay_parameters[i]) + '_dr_' + \
                          str(dropout_parameters[i]) + '_mE_' + str(epochs) + '_rDC_' + \
                          str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + \
-                         str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-                         str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
-                         str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
+                         str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+                         str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + \
+                         str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
         if args.JostLiuCurvature_Online:
             complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + \
                                    '_alpha_' + str(alpha_parameters[i])
@@ -272,9 +274,8 @@ for i in range(0, search_iterations):
         os.system(script_execution_name)
         file_name = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/' + dataset + '_rDC_' + \
                     str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + str(args.DropEdge) + \
-                    '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + '_JLCo_' + \
-                    str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
-                    '_RC_' + str(args.RicciCurvature) + '.pkl'
+                    '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
+                    str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + '.pkl'
         # Save the hyperparameters
         hyperparameters = dict()
         hyperparameters["lr"] = lr_parameters
@@ -300,5 +301,13 @@ for i in range(0, search_iterations):
             hyperparameters["tau"] = tau_parameters
             hyperparameters["iterRicci"] = iterRicci_parameters
             hyperparameters["c"] = c_parameters
+        directory_name = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/'
+        # Check if the directory exists
+        if not exists(directory_name):
+            try:
+                # Create the directory
+                os.makedirs(directory_name)
+            except OSError as e:
+                print(f"Error creating directory '{directory_name}': {e}")
         with open(file_name, 'wb') as f:
             pickle.dump(hyperparameters, f)

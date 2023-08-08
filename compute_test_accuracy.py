@@ -47,10 +47,9 @@ search_iterations = args.search_iterations
 dataset = args.dataset
 file_name_hyperparameters = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/' + dataset + '_rDC_' + \
                             str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + \
-                            str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-                            str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
-                            str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + \
-                            str(args.RicciCurvature) + '.pkl'
+                            str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+                            str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + \
+                            str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + '.pkl'
 with open(file_name_hyperparameters, 'rb') as f:
     hyperparameters = pickle.load(f)
 lr_parameters = hyperparameters["lr"]
@@ -85,8 +84,8 @@ for i in range(0, search_iterations):
                      str(int(hidden_units_parameters[i])) + '_lr_' + str(lr_parameters[i]) + '_wD_' + \
                      str(weight_decay_parameters[i]) + '_dr_' + str(dropout_parameters[i]) + '_mE_' + str(epochs) + \
                      '_rDC_' + str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + \
-                     str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + \
-                     '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
+                     str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+                     str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
                      '_RC_' + str(args.RicciCurvature)
     if args.JostLiuCurvature_Online:
         complement_file_name = '_pA_' + str(pA_parameters[i]) + '_pD_' + str(pD_parameters[i]) + '_alpha_' + str(alpha_parameters[i])
@@ -122,10 +121,10 @@ best_val_indx = np.where(val_mean == np.max(val_mean))
 if best_val_indx[0].shape[0] > 1:
     best_val_indx = ([best_val_indx[0][0]],)
 results_log = 'The best result for rDC_' + str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + \
-              '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-              str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + \
-              '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + ' method with val seeds in ' + \
-              dataset + ' dataset is ' + str(test_mean[best_val_indx]) + '+-' + str(test_std[best_val_indx])
+              '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+              str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
+              '_RC_' + str(args.RicciCurvature) + ' method with val seeds in ' + dataset + ' dataset is ' + \
+              str(test_mean[best_val_indx]) + '+-' + str(test_std[best_val_indx])
 print(results_log)
 hyperparameters_log = 'n_layers: ' + str(int(n_layers_parameters[best_val_indx])) + ' hiddenUnits: ' + \
                       str(int(hidden_units_parameters[best_val_indx])) + ' lr: ' + str(lr_parameters[best_val_indx]) + \
@@ -202,9 +201,8 @@ file_name_base = 'results/' + args.GNN + '/' + dataset + '_nL_' + str(int(n_laye
                  '_wD_' + str(weight_decay_parameters[best_val_indx][0]) + '_dr_' + \
                  str(dropout_parameters[best_val_indx][0]) + '_mE_' + str(epochs) + '_rDC_' + \
                  str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + '_DE_' + str(args.DropEdge) \
-                 + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + '_JLCo_' + \
-                 str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
-                 '_RC_' + str(args.RicciCurvature)
+                 + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
+                 str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
 if args.JostLiuCurvature_Online:
     complement_file_name = '_pA_' + str(pA_parameters[best_val_indx][0]) + '_pD_' + str(pD_parameters[best_val_indx][0])\
                            + '_alpha_' + str(alpha_parameters[best_val_indx][0])
@@ -235,8 +233,8 @@ acc_test_vec_test_seeds = best_acc_test_vec[:, -1]
 boots_series = sns.algorithms.bootstrap(acc_test_vec_test_seeds, func=np.mean, n_boot=1000)
 test_std_test_seeds = np.max(np.abs(sns.utils.ci(boots_series, 95) - np.mean(acc_test_vec_test_seeds)))
 results_log = 'The best result for rDC_' + str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + \
-              '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-              str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + \
-              '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + ' method with test seeds in ' + dataset + ' dataset is ' + \
+              '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLCo_' + \
+              str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + \
+              '_RC_' + str(args.RicciCurvature) + ' method with test seeds in ' + dataset + ' dataset is ' + \
               str(np.mean(boots_series)) + '+-' + str(test_std_test_seeds)
 print(results_log)

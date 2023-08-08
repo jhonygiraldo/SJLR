@@ -8,6 +8,7 @@ import pickle
 import seaborn as sns
 
 from os.path import exists
+import os
 
 import torch
 import torch.nn.functional as functional
@@ -87,8 +88,6 @@ parser.add_argument('--undirected', action='store_true', default=True,
                     help='set to not symmetrize adjacency')
 parser.add_argument("--hyperparameterTunning_mode", action='store_true', default=False,
                     help='Activate hyperparameter tunning mode.')
-parser.add_argument("--is_deep_experiment", action='store_true', default=False,
-                    help='Activate experiments with deep GNNs.')
 args = parser.parse_args()
 print(args)
 
@@ -263,13 +262,8 @@ for n_layers in args.n_layers_set:
                          str(args.lr) + '_wD_' + str(args.weight_decay) + '_dr_' + str(args.dropout) + '_mE_' + \
                          str(args.epochs) + '_rDC_' + str(args.ResidualDenseConnection) + '_pN_' + \
                          str(args.PairNorm) + '_DE_' + str(args.DropEdge) + '_DGN_' + \
-                         str(args.DiffGroupNorm) + '_JLC_' + str(args.JostLiuCurvature) + '_JLCo_' + \
-                         str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + '_GD_' + \
-                         str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
-        if args.JostLiuCurvature:
-            complement_file_name = '_pA_' + str(args.pA) + '_pD_' + str(args.pD) + '_tau_' + str(args.tau) + \
-                                   '_alpha_' + str(args.alpha)
-            file_name_base = file_name_base + complement_file_name
+                         str(args.DiffGroupNorm) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
+                         str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature)
         if args.JostLiuCurvature_Online:
             complement_file_name = '_pA_' + str(args.pA) + '_pD_' + str(args.pD) + '_alpha_' + str(args.alpha)
             file_name_base = file_name_base + complement_file_name
@@ -288,18 +282,30 @@ for n_layers in args.n_layers_set:
         if args.RicciCurvature:
             complement_file_name = '_tau_' + str(args.tau) + '_iRic_' + str(args.iterRicci) + '_c_' + str(args.c)
             file_name_base = file_name_base + complement_file_name
-        if args.hyperparameterTunning_mode and args.is_deep_experiment:
-            file_name = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning_Deep/' + file_name_base + '.pkl'
-        elif args.hyperparameterTunning_mode:
+        if args.hyperparameterTunning_mode:
+            directory_name = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/'
+            # Check if the directory exists
+            if not exists(directory_name):
+                try:
+                    # Create the directory
+                    os.makedirs(directory_name)
+                except OSError as e:
+                    print(f"Error creating directory '{directory_name}': {e}")
             file_name = 'hyperparameters_tuning/' + args.GNN + '_hyperTuning/' + file_name_base + '.pkl'
-        elif args.is_deep_experiment:
-            file_name = 'results/' + args.GNN + '_Deep/' + file_name_base + '.pkl'
         else:
             file_name = 'results/' + args.GNN + '/' + file_name_base + '.pkl'
         if args.hyperparameterTunning_mode:
             with open(file_name, 'wb') as f:
                 pickle.dump([best_acc_test_vec[:, -1], best_acc_val_vec[:, -1]], f)
         else:
+            directory_name = 'results/' + args.GNN + '/'
+            # Check if the directory exists
+            if not exists(directory_name):
+                try:
+                    # Create the directory
+                    os.makedirs(directory_name)
+                except OSError as e:
+                    print(f"Error creating directory '{directory_name}': {e}")
             with open(file_name, 'wb') as f:
                 pickle.dump([loss_train_vec, loss_val_vec, loss_test_vec, best_acc_test_vec, err_test_vec,
                              err_val_vec, err_train_vec], f)
@@ -309,8 +315,8 @@ for n_layers in args.n_layers_set:
         boots_series = sns.algorithms.bootstrap(acc_test_vec_test, func=np.mean, n_boot=1000)
         test_std_test_seeds = np.max(np.abs(sns.utils.ci(boots_series, 95) - np.mean(acc_test_vec_test)))
         results_log = 'The result for rDC_' + str(args.ResidualDenseConnection) + '_pN_' + str(args.PairNorm) + \
-                      '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + '_JLC_' + \
-                      str(args.JostLiuCurvature) + '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + \
-                      str(args.FALayer) + '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + \
+                      '_DE_' + str(args.DropEdge) + '_DGN_' + str(args.DiffGroupNorm) + \
+                      '_JLCo_' + str(args.JostLiuCurvature_Online) + '_FA_' + str(args.FALayer) + \
+                      '_GD_' + str(args.GraphDifussion) + '_RC_' + str(args.RicciCurvature) + \
                       ' method in ' + args.dataset + ' dataset is ' + str(np.mean(boots_series)) + '+-' + str(test_std_test_seeds)
         print(results_log)
